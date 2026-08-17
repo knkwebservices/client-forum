@@ -1,0 +1,36 @@
+# WHMCS
+configuration.php
+license.php
+
+# Dependencies
+/vendor/
+composer.lock
+/node_modules/
+
+# Logs & cache
+*.log
+/logs/
+/cache/
+/templates_c/
+
+# Local/uploaded content
+/attachments/
+/uploads/
+*.sql.gz
+*.sql.bak
+
+# Environment / secrets
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Claude Code local settings
+.claude/settings.local.json
