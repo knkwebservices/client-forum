@@ -42,6 +42,20 @@ Everything listed above is fully free and unlimited — no license key required.
 
 A Pro tier is in development with additional features (reactions, user profile pages, canned responses, thread merge/split, multi-staff ticket assignment, and more). See [knkws.com/whmcs-client-forum](https://knkws.com/whmcs-client-forum/) for current availability and pricing.
 
+## Troubleshooting
+
+**The client area menu doesn't show on the forum page.**
+Some third-party themes only show the client menu (Home, Services, Domains, Billing…) on a fixed list of pages. Find the template file that controls your theme's client menu (usually in `templates/YOUR-THEME/includes/`), look for the long `{if ...}` line listing pages like `clientarea` and `submitticket`, and add this before the closing `}`:
+
+```
+|| $smarty.get.m eq "clientforum"
+```
+
+Re-apply the change after any theme update. The standard WHMCS themes (Twenty-One, Six) are not affected.
+
+**Search doesn't find very short words.**
+MySQL full-text search skips words under 3 characters and common stopwords ("the", "and"). Search with a longer or more specific word.
+
 ## Support
 
 - Issues and bug reports: use the [Issues](../../issues) tab on this repository

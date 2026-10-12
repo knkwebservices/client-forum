@@ -2,9 +2,21 @@
 
 All notable changes to Client Forum are documented here.
 
-## [2.2.0] — Free Release
+## [2.2.1] — Free Release
 
 This is the current free version. All features below are included at no cost, with no license key required.
+
+### Fixed
+- Quotes and other special characters in posts no longer show as `&quot;` (WHMCS pre-encodes form input; it was being escaped twice). Existing posts display correctly without re-saving.
+- Forum colors now adapt to dark themes instead of showing bright white post boxes and editor
+- Staff, Pinned, Locked, Restricted and Best Answer labels are now visible on Bootstrap 4 themes (Twenty-One and most modern themes)
+
+### Notes
+- If your theme hides the client area menu on the forum page, see the README troubleshooting section
+
+## [2.2.0]
+
+This was the first free version.
 
 ### Added
 - Admin panel: "Post a New Thread" form (board select, client email, title/body), attributed to the entered client with an automatic staff badge

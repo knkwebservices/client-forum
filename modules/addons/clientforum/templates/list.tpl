@@ -32,7 +32,7 @@
             <tr>
               <td>
                 <a href="index.php?m=clientforum&forumaction=board&board_id={$board->id}">{$board->name|escape}</a>
-                {if $board->restricted}<span class="label label-info">Restricted</span>{/if}
+                {if $board->restricted}<span class="cf-label cf-label-info">Restricted</span>{/if}
                 {if $board->description}<div class="cf-board-desc">{$board->description|escape}</div>{/if}
               </td>
               <td style="text-align:center;">{$board->thread_count}</td>

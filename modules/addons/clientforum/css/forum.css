@@ -1,43 +1,54 @@
+/* Theme-neutral palette (v2.3.0.4): translucent tints adapt to light AND
+   dark WHMCS themes; text inherits the theme's own colour. */
+.clientforum, .clientforum-widget {
+  --cf-surface: rgba(128, 128, 128, 0.07);
+  --cf-surface-strong: rgba(128, 128, 128, 0.14);
+  --cf-border: rgba(128, 128, 128, 0.28);
+  --cf-muted: inherit;
+  --cf-accent: #337ab7;
+  --cf-success: #3c9a5f;
+}
 .clientforum { margin-top: 10px; }
 .clientforum h2 { margin-bottom: 20px; }
 
 .cf-category { margin-bottom: 30px; }
-.cf-category h3 { border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
+.cf-category h3 { border-bottom: 2px solid var(--cf-border); padding-bottom: 8px; margin-bottom: 10px; }
 
 .cf-board-table td, .cf-thread-table td { vertical-align: middle; }
-.cf-board-desc { font-size: 12px; color: #888; margin-top: 4px; }
+.cf-board-desc { font-size: 12px; opacity: 0.75; margin-top: 4px; }
 
 .cf-board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 
 .cf-post {
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--cf-border);
   border-radius: 4px;
   padding: 14px 16px;
   margin-bottom: 12px;
-  background: #fff;
+  background: var(--cf-surface);
+  color: inherit;
 }
-.cf-post-staff { border-left: 3px solid #337ab7; background: #f7fbff; }
-.cf-post-best { border-left: 3px solid #3c9a5f; background: #f5fbf7; position: relative; }
+.cf-post-staff { border-left: 3px solid var(--cf-accent); background: rgba(51, 122, 183, 0.08); }
+.cf-post-best { border-left: 3px solid var(--cf-success); background: rgba(60, 154, 95, 0.08); position: relative; }
 .cf-post-author { font-weight: 600; }
-.cf-post-karma { font-weight: 400; color: #999; font-size: 11px; margin-left: 6px; }
-.cf-post-date { font-size: 11px; color: #999; margin-bottom: 8px; }
+.cf-post-karma { font-weight: 400; opacity: 0.7; font-size: 11px; margin-left: 6px; }
+.cf-post-date { font-size: 11px; opacity: 0.7; margin-bottom: 8px; }
 .cf-post-edited { font-style: italic; }
 .cf-best-answer-tag {
   position: absolute; top: -1px; right: -1px; background: #3c9a5f; color: #fff;
   font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 0 4px 0 4px;
 }
-.cf-post-actions { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #eee; }
+.cf-post-actions { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--cf-border); }
 .cf-link-action {
-  background: none; border: none; padding: 0; color: #337ab7;
+  background: none; border: none; padding: 0; color: var(--cf-accent);
   text-decoration: underline; cursor: pointer; font-size: 12px;
 }
-.cf-link-action:hover { color: #23527c; }
+.cf-link-action:hover { opacity: 0.8; }
 .cf-best-answer-banner {
-  background: #f5fbf7; border: 1px solid #cdeada; color: #2f7a4a;
+  background: rgba(60, 154, 95, 0.1); border: 1px solid rgba(60, 154, 95, 0.35); color: var(--cf-success);
   padding: 8px 12px; border-radius: 4px; margin-bottom: 16px; font-size: 13px;
 }
 .cf-promoted-note {
-  font-size: 12px; color: #888; margin-bottom: 12px; font-style: italic;
+  font-size: 12px; opacity: 0.75; margin-bottom: 12px; font-style: italic;
 }
 
 .cf-reply-form { margin-top: 20px; }
@@ -49,11 +60,11 @@
 .cf-post-body h4, .cf-post-body h5, .cf-post-body h6 { margin: 14px 0 8px; }
 .cf-post-body ul, .cf-post-body ol { margin: 0 0 10px; padding-left: 24px; }
 .cf-post-body blockquote {
-  border-left: 3px solid #ddd; margin: 0 0 10px; padding: 4px 12px;
-  color: #666; background: #fafafa;
+  border-left: 3px solid var(--cf-border); margin: 0 0 10px; padding: 4px 12px;
+  color: inherit; opacity: 0.9; background: var(--cf-surface);
 }
 .cf-post-body code {
-  background: #f2f2f2; padding: 1px 5px; border-radius: 3px;
+  background: var(--cf-surface-strong); color: inherit; padding: 1px 5px; border-radius: 3px;
   font-family: Consolas, Monaco, monospace; font-size: 13px;
 }
 .cf-post-body pre {
@@ -64,30 +75,30 @@
 .cf-post-body a { word-break: break-all; }
 
 /* Compose editor: toolbar + write/preview */
-.cf-editor { border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+.cf-editor { border: 1px solid var(--cf-border); border-radius: 4px; overflow: hidden; }
 .cf-editor textarea { border: none; border-radius: 0; box-shadow: none; resize: vertical; }
 .cf-editor textarea:focus { outline: none; box-shadow: none; }
 .cf-editor-toolbar {
   display: flex; justify-content: space-between; align-items: center;
-  background: #f7f7f7; border-bottom: 1px solid #ddd; padding: 6px 8px;
+  background: var(--cf-surface); border-bottom: 1px solid var(--cf-border); padding: 6px 8px;
 }
 .cf-editor-tabs { display: flex; gap: 4px; }
 .cf-editor-tab {
   background: none; border: none; padding: 4px 10px; font-size: 12px;
-  color: #666; cursor: pointer; border-radius: 3px;
+  color: inherit; opacity: 0.75; cursor: pointer; border-radius: 3px;
 }
-.cf-editor-tab.active { background: #fff; color: #222; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.cf-editor-tab.active { background: var(--cf-surface-strong); color: inherit; opacity: 1; font-weight: 600; }
 .cf-editor-buttons { display: flex; gap: 2px; }
 .cf-editor-btn {
   background: none; border: none; padding: 4px 9px; font-size: 12px;
-  color: #444; cursor: pointer; border-radius: 3px;
+  color: inherit; cursor: pointer; border-radius: 3px;
 }
-.cf-editor-btn:hover { background: #eaeaea; }
+.cf-editor-btn:hover { background: var(--cf-surface-strong); }
 .cf-editor-preview { padding: 10px 12px; min-height: 80px; }
-.cf-editor-preview-empty { color: #999; font-style: italic; margin: 0; }
-.cf-editor-hint { font-size: 11px; color: #999; margin-top: 4px; }
+.cf-editor-preview-empty { opacity: 0.6; font-style: italic; margin: 0; }
+.cf-editor-hint { font-size: 11px; opacity: 0.7; margin-top: 4px; }
 
-.clientforum-widget ul li { padding: 4px 0; border-bottom: 1px solid #f0f0f0; }
+.clientforum-widget ul li { padding: 4px 0; border-bottom: 1px solid var(--cf-border); }
 .clientforum-widget ul li:last-child { border-bottom: none; }
 
 .clientforum-admin table.datatable { margin-bottom: 24px; width: 100%; }
@@ -102,14 +113,34 @@
 
 /* Leaderboard */
 .cf-my-rank {
-  background: #f5fbf7; border: 1px solid #cdeada; color: #2f7a4a;
+  background: rgba(60, 154, 95, 0.1); border: 1px solid rgba(60, 154, 95, 0.35); color: var(--cf-success);
   padding: 10px 14px; border-radius: 4px; margin-bottom: 18px; font-size: 14px;
 }
-.cf-my-rank-none { background: #f7f7f7; border-color: #e5e5e5; color: #777; }
+.cf-my-rank-none { background: var(--cf-surface); border-color: var(--cf-border); color: inherit; }
 .cf-leaderboard-table .cf-rank-cell { font-size: 16px; text-align: center; }
-.cf-leaderboard-me { background: #fffbea; }
+.cf-leaderboard-me { background: rgba(240, 173, 78, 0.12); }
 
 /* Search */
 .cf-search-form { margin-bottom: 18px; }
 .cf-search-form input[type="text"] { margin-right: 6px; }
-.cf-search-hint { color: #888; font-size: 13px; margin-bottom: 14px; }
+.cf-search-hint { opacity: 0.75; font-size: 13px; margin-bottom: 14px; }
+
+/* Textareas/inputs inside the forum follow the theme instead of forcing white */
+.clientforum .cf-editor textarea { background: transparent; color: inherit; }
+
+/* Staff badge: own style so it works on Bootstrap 3 and 4 themes alike */
+.cf-staff-badge {
+  display: inline-block; background: var(--cf-accent, #337ab7); color: #fff;
+  font-size: 11px; font-weight: 600; line-height: 1; padding: 3px 7px;
+  border-radius: 3px; margin-left: 6px; vertical-align: middle;
+}
+
+/* Status labels (Pinned / Locked / Restricted / Best Answer) */
+.cf-label {
+  display: inline-block; color: #fff; font-size: 11px; font-weight: 600;
+  line-height: 1; padding: 3px 7px; border-radius: 3px; margin-right: 4px; vertical-align: middle;
+}
+.cf-label-warning { background: #e09a2c; }
+.cf-label-default { background: #777; }
+.cf-label-info    { background: #2b9bb8; }
+.cf-label-success { background: var(--cf-success, #3c9a5f); }

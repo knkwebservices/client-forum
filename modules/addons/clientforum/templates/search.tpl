@@ -26,8 +26,8 @@
         {foreach from=$results item=thread}
           <tr>
             <td>
-              {if $thread->is_pinned}<span class="label label-warning">Pinned</span>{/if}
-              {if $thread->is_locked}<span class="label label-default">Locked</span>{/if}
+              {if $thread->is_pinned}<span class="cf-label cf-label-warning">Pinned</span>{/if}
+              {if $thread->is_locked}<span class="cf-label cf-label-default">Locked</span>{/if}
               <a href="index.php?m=clientforum&forumaction=thread&thread_id={$thread->id}">{$thread->title|escape}</a>
             </td>
             <td>{$thread->board_name|escape}</td>

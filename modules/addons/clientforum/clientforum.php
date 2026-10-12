@@ -24,6 +24,34 @@ require_once __DIR__ . '/lib/Markdown.php';
 require_once __DIR__ . '/lib/Webhook.php';
 
 /**
+ * WHMCS HTML-encodes all request input before modules see it, so a typed
+ * " arrives as &quot;. Post text is stored raw and escaped once at render
+ * time (lib/Markdown.php), so decode it here first, otherwise it is
+ * escaped twice and clients see literal &quot; in their posts.
+ */
+function clientforum_decode($value)
+{
+    return html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+
+function clientforum_input($key)
+{
+    return trim(clientforum_decode($_POST[$key] ?? ''));
+}
+
+/**
+ * Posts saved before v2.2.1 may already contain encoded entities;
+ * decode them for the edit form so saving doesn't keep them.
+ */
+function clientforum_decode_post_for_edit($post, $thread)
+{
+    $post->body = clientforum_decode($post->body);
+    $thread->title = clientforum_decode($thread->title);
+    return $post;
+}
+
+
+/**
  * Reads a single configured value for this addon module (one of the
  * keys defined in clientforum_config()['fields']) from WHMCS's own
  * tbladdonmodules table — the same place the admin "Configure" screen
@@ -115,7 +143,7 @@ function clientforum_config()
     return [
         'name' => 'Client Forum (Free)',
         'description' => 'Adds a native, SSO-integrated support forum to the client area — no separate login, optional product-gated boards.',
-        'version' => '2.2.0-free',
+        'version' => '2.2.1-free',
         'author' => 'knkws.com',
         'fields' => [
             'default_language' => [
@@ -395,8 +423,8 @@ function clientforum_output($vars)
         } else {
             $newThreadBoardId = (int) ($_POST['board_id'] ?? 0);
             $clientEmail = trim($_POST['client_email'] ?? '');
-            $newThreadTitle = trim($_POST['title'] ?? '');
-            $newThreadBody = trim($_POST['body'] ?? '');
+            $newThreadTitle = clientforum_input('title');
+            $newThreadBody = clientforum_input('body');
             $newThreadBoard = $newThreadBoardId ? Forum::getBoard($newThreadBoardId) : null;
 
             if (!$newThreadBoard) {
@@ -990,7 +1018,7 @@ function clientforum_view_thread($clientId, $threadId)
         // Rendered here (not in the template) so there's exactly one
         // place in the codebase that turns post Markdown into HTML —
         // easier to audit for XSS than spreading it across templates.
-        $post->body_html = Markdown::toHtml($post->body);
+        $post->body_html = Markdown::toHtml(clientforum_decode($post->body));
         $post->author_karma = $karmaMap[$post->client_id] ?? 0;
         $post->can_edit = Forum::canEditPost($post, $clientId);
     }
@@ -1030,8 +1058,8 @@ function clientforum_new_thread($clientId, $boardId)
 
     $error = null;
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $title = trim($_POST['title'] ?? '');
-        $body = trim($_POST['body'] ?? '');
+        $title = clientforum_input('title');
+        $body = clientforum_input('body');
 
         if (!Csrf::validate('client_newthread_' . $boardId, $_POST['csrf_token'] ?? '')) {
             $error = 'Security check failed — please try again.';
@@ -1074,7 +1102,7 @@ function clientforum_reply($clientId, $threadId)
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $body = trim($_POST['body'] ?? '');
+        $body = clientforum_input('body');
         $tokenOk = Csrf::validate('client_reply_' . $threadId, $_POST['csrf_token'] ?? '');
 
         if ($tokenOk
@@ -1115,8 +1143,8 @@ function clientforum_edit_post($clientId, $postId)
     $error = null;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $body = trim($_POST['body'] ?? '');
-        $title = $isFirstPost ? trim($_POST['title'] ?? '') : null;
+        $body = clientforum_input('body');
+        $title = $isFirstPost ? clientforum_input('title') : null;
 
         if (!Csrf::validate('client_editpost_' . $postId, $_POST['csrf_token'] ?? '')) {
             $error = 'Security check failed — please try again.';
@@ -1148,7 +1176,7 @@ function clientforum_edit_post($clientId, $postId)
         'templatefile' => 'editpost',
         'requirelogin' => true,
         'vars' => [
-            'post' => $post,
+            'post' => clientforum_decode_post_for_edit($post, $thread),
             'thread' => $thread,
             'isFirstPost' => $isFirstPost,
             'error' => $error,

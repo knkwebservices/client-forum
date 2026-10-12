@@ -7,7 +7,7 @@
 
   {if $thread->best_answer_post_id}
     <div class="cf-best-answer-banner">
-      <span class="label label-success">Best Answer</span> This thread has an accepted answer below.
+      <span class="cf-label cf-label-success">Best Answer</span> This thread has an accepted answer below.
     </div>
   {/if}
 
@@ -16,7 +16,7 @@
       {if $post->is_best_answer}<div class="cf-best-answer-tag">✓ Best Answer</div>{/if}
       <div class="cf-post-author">
         {$post->firstname|escape} {$post->lastname|escape}
-        {if $post->is_staff_post}<span class="label label-primary">Staff</span>{/if}
+        {if $post->is_staff_post}<span class="cf-staff-badge">Staff</span>{/if}
         <span class="cf-post-karma">{$post->author_karma} pts</span>
       </div>
       <div class="cf-post-date">{$post->created_at}{if $post->edited_at} · <span class="cf-post-edited">edited {$post->edited_at}</span>{/if}</div>
