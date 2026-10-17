@@ -19,6 +19,6 @@
     <button type="submit" class="btn btn-primary">Post Thread</button>
     <a href="index.php?m=clientforum&forumaction=board&board_id={$board->id}" class="btn btn-default">Cancel</a>
   </form>
-  <script src="modules/addons/clientforum/js/editor.js"></script>
+  <script src="modules/addons/clientforum/js/editor.js?v=2.2.2"></script>
   <script>attachMarkdownEditor('cf-newthread-body');</script>
 </div>

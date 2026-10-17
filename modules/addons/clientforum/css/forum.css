@@ -73,6 +73,10 @@
 }
 .cf-post-body pre code { background: none; padding: 0; color: inherit; }
 .cf-post-body a { word-break: break-all; }
+/* Links in posts and the preview are underlined so they stand out on
+   every theme, even ones whose link color matches the body text. */
+.cf-post-body a, .cf-editor-preview a { text-decoration: underline; text-underline-offset: 2px; }
+.cf-editor-preview a { word-break: break-all; }
 
 /* Compose editor: toolbar + write/preview */
 .cf-editor { border: 1px solid var(--cf-border); border-radius: 4px; overflow: hidden; }
@@ -144,3 +148,37 @@
 .cf-label-default { background: #777; }
 .cf-label-info    { background: #2b9bb8; }
 .cf-label-success { background: var(--cf-success, #3c9a5f); }
+
+/* Admin forms — WHMCS's Iris admin theme doesn't style bare inputs, so
+   give the module's own form fields a consistent look on every theme. */
+.clientforum-admin input[type="text"],
+.clientforum-admin input[type="email"],
+.clientforum-admin input[type="number"],
+.clientforum-admin select,
+.clientforum-admin textarea {
+  display: inline-block;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+  margin-bottom: 6px;
+}
+.clientforum-admin textarea { width: 100%; max-width: 640px; min-height: 120px; }
+.clientforum-admin input[type="text"]:focus,
+.clientforum-admin input[type="email"]:focus,
+.clientforum-admin input[type="number"]:focus,
+.clientforum-admin select:focus,
+.clientforum-admin textarea:focus {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(102, 175, 233, 0.25);
+}
+.clientforum-admin input[type="checkbox"] { margin-right: 4px; vertical-align: middle; }
+.clientforum-admin label { font-weight: normal; }

@@ -39,12 +39,28 @@
       return '\u0000INLINECODE' + idx + '\u0000';
     });
 
-    text = text.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,
-      '<a href="$2" target="_blank" rel="nofollow noopener noreferrer">$1</a>');
+    var links = [];
+    text = text.replace(/\[([^\]\n]+)\]\(\s*(https?:\/\/[^\s)]+)\s*\)/g, function (m, label, url) {
+      var idx = links.length;
+      links.push('<a href="' + url + '" target="_blank" rel="nofollow noopener noreferrer">' + label.trim() + '</a>');
+      return '\u0000LINK' + idx + '\u0000';
+    });
+    text = text.replace(/(^|[^\w\/])(https?:\/\/[^\s<\u0000]+)/g, function (m, lead, url) {
+      var trail = '';
+      var p = url.match(/^(.*?)((?:[.,;:!?)\]]|&quot;|&#039;)+)$/);
+      if (p) { url = p[1]; trail = p[2]; }
+      if (!/^https?:\/\/./.test(url)) return m;
+      var idx = links.length;
+      links.push('<a href="' + url + '" target="_blank" rel="nofollow noopener noreferrer">' + url + '</a>');
+      return lead + '\u0000LINK' + idx + '\u0000' + trail;
+    });
 
     text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
     text = text.replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, '$1<em>$2</em>');
+    links.forEach(function (link, i) {
+      text = text.split('\u0000LINK' + i + '\u0000').join(link);
+    });
 
     var lines = text.split('\n');
     var html = [];
@@ -189,8 +205,23 @@
     addButton('I', 'Italic', function () { wrapSelection(textarea, '*'); });
     addButton('</>', 'Inline code', function () { wrapSelection(textarea, '`'); });
     addButton('Link', 'Insert link', function () {
-      var url = window.prompt('URL (https://...)');
+      // Shrink the selection past any leading/trailing spaces or line
+      // breaks first. Selecting a URL by dragging often grabs the newline
+      // after it, which used to produce a broken [url\n](url) link.
+      var value = textarea.value;
+      var start = textarea.selectionStart;
+      var end = textarea.selectionEnd;
+      while (start < end && /\s/.test(value.charAt(start))) start++;
+      while (end > start && /\s/.test(value.charAt(end - 1))) end--;
+      textarea.selectionStart = start;
+      textarea.selectionEnd = end;
+
+      var selected = value.slice(start, end);
+      var suggested = /^https?:\/\/\S+$/.test(selected) ? selected : 'https://';
+      var url = window.prompt('URL (https://...)', suggested);
       if (!url) return;
+      url = url.trim();
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
       wrapSelection(textarea, '[', '](' + url + ')');
     });
     addButton('List', 'Bullet list', function () { prefixLines(textarea, '- '); });

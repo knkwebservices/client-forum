@@ -52,9 +52,30 @@ class Markdown
             return $placeholder;
         }, $text);
 
-        // Step 4: links — [text](url), http(s) only.
-        $text = preg_replace_callback('/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/', function ($m) {
-            return '<a href="' . $m[2] . '" target="_blank" rel="nofollow noopener noreferrer">' . $m[1] . '</a>';
+        // Step 4: links — [text](url), http(s) only. Each finished link is
+        // parked behind a placeholder so the bare-URL pass below can't
+        // re-link the URL sitting inside its href.
+        $links = [];
+        $text = preg_replace_callback('/\[([^\]\n]+)\]\(\s*(https?:\/\/[^\s)]+)\s*\)/', function ($m) use (&$links) {
+            $placeholder = "\x00LINK" . count($links) . "\x00";
+            $links[] = '<a href="' . $m[2] . '" target="_blank" rel="nofollow noopener noreferrer">' . trim($m[1]) . '</a>';
+            return $placeholder;
+        }, $text);
+
+        // Step 4b: bare http(s) URLs typed straight into a post become
+        // clickable too. Trailing punctuation (a sentence-ending period or
+        // comma) is left outside the link.
+        $text = preg_replace_callback('/(?<![\w\/])(https?:\/\/[^\s<\x00]+)/', function ($m) use (&$links) {
+            $url = $m[1];
+            $trail = '';
+            if (preg_match('/^(.*?)((?:[.,;:!?)\]]|&quot;|&#039;)+)$/', $url, $p)) {
+                $url = $p[1];
+                $trail = $p[2];
+            }
+            if ($url === '' || !preg_match('/^https?:\/\/./', $url)) return $m[0];
+            $placeholder = "\x00LINK" . count($links) . "\x00";
+            $links[] = '<a href="' . $url . '" target="_blank" rel="nofollow noopener noreferrer">' . $url . '</a>';
+            return $placeholder . $trail;
         }, $text);
 
         // Step 5: bold, italic (order matters — bold before italic so
@@ -62,6 +83,12 @@ class Markdown
         $text = preg_replace('/\*\*([^\*\n]+)\*\*/', '<strong>$1</strong>', $text);
         $text = preg_replace('/\*([^\*\n]+)\*/', '<em>$1</em>', $text);
         $text = preg_replace('/(?<!\w)_([^_\n]+)_(?!\w)/', '<em>$1</em>', $text);
+
+        // Links go back in only now, so underscores or asterisks inside a
+        // URL (my_page_name) never get turned into <em> tags.
+        foreach ($links as $i => $link) {
+            $text = str_replace("\x00LINK{$i}\x00", $link, $text);
+        }
 
         // Step 6: line-by-line block structure (headings, lists,
         // blockquotes, paragraphs).

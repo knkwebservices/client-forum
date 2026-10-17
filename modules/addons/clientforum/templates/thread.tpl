@@ -22,12 +22,12 @@
       <div class="cf-post-date">{$post->created_at}{if $post->edited_at} · <span class="cf-post-edited">edited {$post->edited_at}</span>{/if}</div>
       <div class="cf-post-body">{$post->body_html}</div>
 
-      {if $post->can_edit || ($canMarkBestAnswer && !$smarty.foreach.postloop.first)}
+      {if $post->can_edit || ($canMarkBestAnswer && !$post->is_opening_post)}
         <div class="cf-post-actions">
           {if $post->can_edit}
             <a href="index.php?m=clientforum&forumaction=editpost&post_id={$post->id}" class="cf-link-action">Edit</a>
           {/if}
-          {if $canMarkBestAnswer && !$smarty.foreach.postloop.first}
+          {if $canMarkBestAnswer && !$post->is_opening_post}
             {if $post->is_best_answer}
               <form method="post" action="index.php?m=clientforum&forumaction=unmarkbestanswer&thread_id={$thread->id}" style="display:inline;">
                 <input type="hidden" name="csrf_token" value="{$bestAnswerToken}">
@@ -56,7 +56,7 @@
       <br>
       <button type="submit" class="btn btn-primary">Post Reply</button>
     </form>
-    <script src="modules/addons/clientforum/js/editor.js"></script>
+    <script src="modules/addons/clientforum/js/editor.js?v=2.2.2"></script>
     <script>attachMarkdownEditor('cf-reply-body');</script>
   {/if}
 

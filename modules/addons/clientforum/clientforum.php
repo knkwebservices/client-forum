@@ -143,8 +143,8 @@ function clientforum_config()
     return [
         'name' => 'Client Forum (Free)',
         'description' => 'Adds a native, SSO-integrated support forum to the client area — no separate login, optional product-gated boards.',
-        'version' => '2.2.1-free',
-        'author' => 'knkws.com',
+        'version' => '2.2.2-free',
+        'author' => 'K & K Web Services',
         'fields' => [
             'default_language' => [
                 'FriendlyName' => 'Default Language',
@@ -379,7 +379,7 @@ function clientforum_output($vars)
 {
     $action = $_REQUEST['forumaction'] ?? '';
 
-    echo '<link rel="stylesheet" href="modules/addons/clientforum/css/forum.css">';
+    echo '<link rel="stylesheet" href="modules/addons/clientforum/css/forum.css?v=2.2.2">';
     echo '<div class="clientforum-admin">';
 
     if ($action === 'addcategory' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -697,6 +697,9 @@ function clientforum_output($vars)
     echo '<input type="text" name="description" placeholder="Description" maxlength="' . Forum::MAX_BOARD_DESCRIPTION_LENGTH . '" style="width:220px;"> ';
     echo '<label><input type="checkbox" name="restricted" value="1"> Restrict to specific products</label><br><br>';
     echo '<div style="max-height:150px;overflow-y:auto;border:1px solid #ddd;padding:8px;max-width:400px;">';
+    if (count($products) === 0) {
+        echo '<span style="color:#888;">No products set up yet. Add products in WHMCS to restrict a board to them.</span>';
+    }
     foreach ($products as $product) {
         $safeProductName = htmlspecialchars($product->name, ENT_QUOTES, 'UTF-8');
         echo "<label style=\"display:block;\"><input type=\"checkbox\" name=\"product_ids[]\" value=\"{$product->id}\"> {$safeProductName}</label>";
@@ -862,7 +865,7 @@ function clientforum_output($vars)
     echo 'Discord: ' . ($discordConfigured ? '<span style="color:#3c9a5f;">configured</span>' : '<span style="color:#999;">not configured</span>') . ' &nbsp;|&nbsp; ';
     echo 'New-thread notifications: ' . ($notifyEnabled ? '<span style="color:#3c9a5f;">on</span>' : '<span style="color:#999;">off</span>');
     echo '</p>';
-    echo '<p style="color:#888;font-size:13px;">Set the webhook URLs under this module\'s <strong>Configure</strong> screen (Setup → Addon Modules). Once set, new threads — including ones created via ticket promotion — will ping the configured channel(s).</p>';
+    echo '<p style="color:#888;font-size:13px;">Set the webhook URLs under this module\'s <strong>Configure</strong> screen (Configuration → System Settings → Addon Modules). Once set, new threads — including ones created via ticket promotion — will ping the configured channel(s).</p>';
 
     if (!$slackConfigured && !$discordConfigured) {
         echo '<div class="alert alert-info">No webhook configured yet.</div>';
@@ -1013,6 +1016,7 @@ function clientforum_view_thread($clientId, $threadId)
         $authorIds[] = $post->client_id;
     }
     $karmaMap = Forum::getKarmaBulk($authorIds);
+    $firstPostId = Forum::getFirstPostId($threadId);
 
     foreach ($posts as $post) {
         // Rendered here (not in the template) so there's exactly one
@@ -1021,6 +1025,7 @@ function clientforum_view_thread($clientId, $threadId)
         $post->body_html = Markdown::toHtml(clientforum_decode($post->body));
         $post->author_karma = $karmaMap[$post->client_id] ?? 0;
         $post->can_edit = Forum::canEditPost($post, $clientId);
+        $post->is_opening_post = ((int) $post->id === (int) $firstPostId);
     }
 
     // Only the thread starter or staff can mark/unmark a best answer —

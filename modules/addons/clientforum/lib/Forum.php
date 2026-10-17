@@ -17,6 +17,16 @@ if (!defined('WHMCS')) {
 
 class Forum
 {
+    /** InnoDB's default innodb_ft_min_token_size. */
+    const FULLTEXT_MIN_TOKEN = 3;
+
+    /** InnoDB's default FULLTEXT stopword list. */
+    const FULLTEXT_STOPWORDS = [
+        'a', 'about', 'an', 'are', 'as', 'at', 'be', 'by', 'com', 'de', 'en', 'for',
+        'from', 'how', 'i', 'in', 'is', 'it', 'la', 'of', 'on', 'or', 'that', 'the',
+        'this', 'to', 'was', 'what', 'when', 'where', 'who', 'will', 'with', 'und', 'www',
+    ];
+
     const RATE_LIMIT_MAX_POSTS = 5;      // max posts...
     const RATE_LIMIT_WINDOW_SECONDS = 60; // ...per this many seconds
 
@@ -124,7 +134,10 @@ class Forum
         return Capsule::table('mod_forum_posts')
             ->join('tblclients', 'tblclients.id', '=', 'mod_forum_posts.client_id')
             ->where('thread_id', $threadId)
-            ->orderBy('mod_forum_posts.created_at')
+            // Ordered by id, not created_at: ids only ever go up, while
+            // timestamps can jump backwards on a server timezone change or a
+            // DST fall-back, which used to scramble thread order.
+            ->orderBy('mod_forum_posts.id')
             ->select(
                 'mod_forum_posts.*',
                 'tblclients.firstname',
@@ -246,11 +259,23 @@ class Forum
         $visibleBoardIds = self::getVisibleBoardIds($clientId);
         if (empty($visibleBoardIds)) return [];
 
-        $booleanQuery = self::buildBooleanFulltextQuery($query);
-        if ($booleanQuery === '') return [];
-
         $limit = (int) $limit;
         $boardPlaceholders = implode(',', array_fill(0, count($visibleBoardIds), '?'));
+
+        $booleanQuery = self::buildBooleanFulltextQuery($query);
+        if ($booleanQuery === '') {
+            // Every word was too short or a stopword, so FULLTEXT can't
+            // match anything. Fall back to a plain substring search so
+            // queries like "VPN" on a 4-char index or "how to" still work.
+            $like = '%' . addcslashes($query, '%_\\') . '%';
+            $sql = "SELECT DISTINCT t.* FROM mod_forum_threads t
+                    LEFT JOIN mod_forum_posts p ON p.thread_id = t.id
+                    WHERE t.board_id IN ({$boardPlaceholders})
+                    AND (t.title LIKE ? OR p.body LIKE ?)
+                    ORDER BY t.last_post_at DESC
+                    LIMIT {$limit}";
+            return Capsule::select($sql, array_merge($visibleBoardIds, [$like, $like]));
+        }
 
         // DISTINCT + LEFT JOIN against posts so a thread with several
         // matching replies still comes back as one row, not several.
@@ -290,6 +315,11 @@ class Forum
         foreach ($tokens as $token) {
             $token = preg_replace('/[+\-><()~*"@]+/', '', $token);
             if ($token === '') continue;
+            // InnoDB never indexes words shorter than its minimum token
+            // size or on its stopword list, so a required "+the*" term
+            // makes the whole query return nothing. Skip those words.
+            if (mb_strlen($token) < self::FULLTEXT_MIN_TOKEN) continue;
+            if (in_array(mb_strtolower($token), self::FULLTEXT_STOPWORDS, true)) continue;
             $terms[] = '+' . $token . '*';
         }
         return implode(' ', $terms);
@@ -543,19 +573,27 @@ class Forum
             return ['success' => false, 'message' => 'Post not found in this thread.'];
         }
 
+        if ((int) $postId === (int) self::getFirstPostId($threadId)) {
+            return ['success' => false, 'message' => 'The opening post can\'t be marked as the best answer.'];
+        }
+
         if ($thread->best_answer_post_id == $postId) {
             return ['success' => true, 'message' => 'Already marked as the best answer.'];
         }
 
         Capsule::transaction(function () use ($thread, $post, $threadId, $postId) {
-            // Moving the mark from a previous post to a new one: reverse
-            // the previous author's bonus (unless it's the same person
-            // answering their own thread twice, which self-cancels).
+            // Moving the mark from a previous post to a new one. If both
+            // posts belong to the same author, that author already holds
+            // the bonus, so nothing changes hands; otherwise the bonus
+            // moves from the previous author to the new one.
+            $authorAlreadyHasBonus = false;
             if ($thread->best_answer_post_id) {
                 $previousPost = Capsule::table('mod_forum_posts')->where('id', $thread->best_answer_post_id)->first();
                 if ($previousPost) {
                     Capsule::table('mod_forum_posts')->where('id', $previousPost->id)->update(['is_best_answer' => 0]);
-                    if ($previousPost->client_id != $post->client_id) {
+                    if ((int) $previousPost->client_id === (int) $post->client_id) {
+                        $authorAlreadyHasBonus = true;
+                    } else {
                         self::addKarma($previousPost->client_id, -self::KARMA_BEST_ANSWER);
                     }
                 }
@@ -563,7 +601,9 @@ class Forum
 
             Capsule::table('mod_forum_posts')->where('id', $postId)->update(['is_best_answer' => 1]);
             Capsule::table('mod_forum_threads')->where('id', $threadId)->update(['best_answer_post_id' => $postId]);
-            self::addKarma($post->client_id, self::KARMA_BEST_ANSWER);
+            if (!$authorAlreadyHasBonus) {
+                self::addKarma($post->client_id, self::KARMA_BEST_ANSWER);
+            }
         });
 
         return ['success' => true, 'message' => 'Marked as the best answer.'];

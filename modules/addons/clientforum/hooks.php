@@ -25,7 +25,7 @@ add_hook('ClientAreaPrimaryNavbar', 1, function ($primaryNavbar) {
 });
 
 add_hook('ClientAreaHeadOutput', 1, function ($vars) {
-    return '<link rel="stylesheet" type="text/css" href="modules/addons/clientforum/css/forum.css">';
+    return '<link rel="stylesheet" type="text/css" href="modules/addons/clientforum/css/forum.css?v=2.2.2">';
 });
 
 add_hook('ClientAreaHomepagePanels', 1, function ($vars) {
