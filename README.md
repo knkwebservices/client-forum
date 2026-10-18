@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/banner.png" alt="Client Forum for WHMCS: free, open-source forum embedded in the WHMCS client area with single sign-on" width="100%"></p>
+
 # Client Forum for WHMCS
 
 A free WHMCS addon module that embeds a discussion forum directly inside your client area — using each client's existing WHMCS login, with no separate registration required.
