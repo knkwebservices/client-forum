@@ -2,7 +2,13 @@
 
 All notable changes to Client Forum are documented here.
 
-The current free version is 2.2.2. All features below are included at no cost, with no license key required.
+The current free version is 2.2.3. All features below are included at no cost, with no license key required.
+
+## [2.2.3] — Free Release
+
+### Fixed
+- Clicking the Forum menu link while logged out no longer causes a "too many redirects" error. Logged-out visitors now go to the WHMCS login page and come back to the forum after signing in.
+- The admin page now loads its stylesheet. It was looking in the WHMCS admin folder instead of the main folder, so admin pages showed without their styling.
 
 ## [2.2.2] — Free Release
 

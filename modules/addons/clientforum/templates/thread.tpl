@@ -56,7 +56,7 @@
       <br>
       <button type="submit" class="btn btn-primary">Post Reply</button>
     </form>
-    <script src="modules/addons/clientforum/js/editor.js?v=2.2.2"></script>
+    <script src="modules/addons/clientforum/js/editor.js?v=2.2.3"></script>
     <script>attachMarkdownEditor('cf-reply-body');</script>
   {/if}
 

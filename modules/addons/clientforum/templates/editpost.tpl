@@ -24,6 +24,6 @@
     <button type="submit" class="btn btn-primary">Save Changes</button>
     <a href="index.php?m=clientforum&forumaction=thread&thread_id={$thread->id}" class="btn btn-default">Cancel</a>
   </form>
-  <script src="modules/addons/clientforum/js/editor.js?v=2.2.2"></script>
+  <script src="modules/addons/clientforum/js/editor.js?v=2.2.3"></script>
   <script>attachMarkdownEditor('cf-editpost-body');</script>
 </div>

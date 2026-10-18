@@ -143,7 +143,7 @@ function clientforum_config()
     return [
         'name' => 'Client Forum (Free)',
         'description' => 'Adds a native, SSO-integrated support forum to the client area — no separate login, optional product-gated boards.',
-        'version' => '2.2.2-free',
+        'version' => '2.2.3-free',
         'author' => 'K & K Web Services',
         'fields' => [
             'default_language' => [
@@ -379,7 +379,8 @@ function clientforum_output($vars)
 {
     $action = $_REQUEST['forumaction'] ?? '';
 
-    echo '<link rel="stylesheet" href="modules/addons/clientforum/css/forum.css?v=2.2.2">';
+    // The admin area runs from WHMCS's admin folder, so the path steps up one level.
+    echo '<link rel="stylesheet" href="../modules/addons/clientforum/css/forum.css?v=2.2.3">';
     echo '<div class="clientforum-admin">';
 
     if ($action === 'addcategory' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -886,9 +887,17 @@ function clientforum_output($vars)
 // ---------------------------------------------------------------------
 function clientforum_clientarea($vars)
 {
-    if (!isset($_SESSION['uid'])) {
-        header('Location: index.php?m=clientforum&nolayout=1');
-        return ['pagetitle' => 'Login Required', 'breadcrumb' => [], 'templatefile' => 'error', 'vars' => ['message' => 'Please log in to access the forum.']];
+    if (empty($_SESSION['uid'])) {
+        // requirelogin makes WHMCS send the visitor to its own login page
+        // and back here afterwards. (Before 2.2.3 this redirected to the
+        // forum itself, which looped forever for logged-out visitors.)
+        return [
+            'pagetitle' => 'Forum',
+            'breadcrumb' => ['index.php?m=clientforum' => 'Forum'],
+            'templatefile' => 'error',
+            'requirelogin' => true,
+            'vars' => ['message' => 'Please log in to access the forum.'],
+        ];
     }
 
     $clientId = (int) $_SESSION['uid'];
