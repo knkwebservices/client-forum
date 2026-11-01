@@ -26,15 +26,15 @@ Built by [K & K Web Services](https://knkws.com).
 
 ## Requirements
 
-- WHMCS 8.x
-- PHP 7.4+
-- MySQL/MariaDB with FULLTEXT index support
+- WHMCS 8.x or 9.x (tested on WHMCS 9.1)
+- PHP 7.4 or newer, including PHP 8.x (use the PHP version your WHMCS release supports)
+- MySQL 5.6+ or MariaDB 10.0+ with InnoDB (for FULLTEXT search)
 
 ## Installation
 
 1. Download or clone this repository.
 2. Copy the `modules/addons/clientforum` folder into your WHMCS installation's `modules/addons/` directory.
-3. In the WHMCS admin panel, go to **Setup → Addon Modules**, find **Client Forum**, and click **Activate**.
+3. In the WHMCS admin panel, go to **Configuration → System Settings → Addon Modules**, find **Client Forum**, and click **Activate**.
 4. Configure access permissions and any product-gating rules from the module's admin settings page.
 5. (Optional) Add your Slack or Discord webhook URL in the module settings to enable notifications.
 
@@ -42,7 +42,7 @@ Built by [K & K Web Services](https://knkws.com).
 
 Everything listed above is fully free and unlimited — no license key required.
 
-A Pro tier is in development with additional features (reactions, user profile pages, canned responses, thread merge/split, multi-staff ticket assignment, and more). See [knkws.com/whmcs-client-forum](https://knkws.com/whmcs-client-forum/) for current availability and pricing.
+**Client Forum Pro** is available with more features: reactions, member profiles and photos, a spam and profanity filter, scheduled announcements, multi-staff assignment, canned responses, thread merge/split, an audit log, and Promote to Ticket. See [knkws.com/whmcs-client-forum](https://knkws.com/whmcs-client-forum/) for details and pricing.
 
 ## Troubleshooting
 
